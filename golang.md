@@ -90,7 +90,8 @@ func main() {
 
 ## 文本分词
 ```go
-content, err := ioutil.ReadFile("wc.go")
+func main() {
+	content, err := ioutil.ReadFile("wc.go")
 	if err != nil {
 		panic(err)
 	}
@@ -101,4 +102,5 @@ content, err := ioutil.ReadFile("wc.go")
 	for _, word := range words {
 		fmt.Println(word)
 	}
+}
 ```
