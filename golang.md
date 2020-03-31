@@ -87,3 +87,18 @@ func main() {
 	binary.Read(buff, binary.BigEndian, &header)
 }
 ```
+
+## 文本分词
+```go
+content, err := ioutil.ReadFile("wc.go")
+	if err != nil {
+		panic(err)
+	}
+	f := func(c rune) bool {
+		return !unicode.IsLetter(c) && !unicode.IsNumber(c)
+	}
+	words := strings.FieldsFunc(string(content), f)
+	for _, word := range words {
+		fmt.Println(word)
+	}
+```
