@@ -1,0 +1,17 @@
+cmake_minimum_required(VERSION 3.8)
+
+project(learn_socket)
+if (UNIX AND NOT APPLE)
+    set (LINUX TRUE)
+endif()
+
+add_subdirectory(select)
+add_subdirectory(poll)
+if (WIN32)
+add_subdirectory(iocp)
+add_subdirectory(event_select)
+elseif(LINUX)
+add_subdirectory(epoll)
+add_subdirectory(iouring)
+add_subdirectory(io_uring)
+endif()

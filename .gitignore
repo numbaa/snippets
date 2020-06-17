@@ -1,0 +1,17 @@
+# project files
+.vs
+.vscode
+build
+.sln
+
+# vim tmp file
+.swp
+
+# compile output
+*.out
+*.exe
+*.o
+*.obj
+*.lib
+*.a
+*.so
