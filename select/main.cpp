@@ -5,15 +5,14 @@
 #include <netinet/in.h>
 #include <sys/select.h>
 #include <sys/socket.h>
+#include <unistd.h>
 #endif
-#include <array>
-#include <iostream>
-#include <functional>
-#include <set>
 
-#ifdef _WIN32
-#define socket_t SOCKET
-#endif
+#include <array>
+#include <cstring>
+#include <functional>
+#include <iostream>
+#include <set>
 
 // class Proactor {
 // public:
@@ -23,27 +22,27 @@
 
 int serve(uint16_t port)
 {
-    std::array<uint8_t, 2048> buffer{};
+    std::array<uint8_t, 2048> buffer {};
 
     sockaddr_in listen_addr;
     ::memset(&listen_addr, 0, sizeof(listen_addr));
     listen_addr.sin_family = AF_INET;
-    listen_addr.sin_addr.S_un.S_addr = ::htonl(INADDR_ANY);
+    listen_addr.sin_addr.s_addr = ::htonl(INADDR_ANY);
     listen_addr.sin_port = ::htons(port);
-    socket_t server_socket = ::socket(AF_INET, SOCK_STREAM, 0);
+    int server_socket = ::socket(AF_INET, SOCK_STREAM, 0);
     int ret = ::bind(server_socket, reinterpret_cast<sockaddr*>(&listen_addr), sizeof(listen_addr));
     if (ret < 0) {
         std::cerr << "bind() error: " << ::strerror(errno) << std::endl;
         return -1;
     }
-    int ret = ::listen(server_socket, 5);
+    ret = ::listen(server_socket, 5);
     if (ret < 0) {
         std::cerr << "bind() error: " << ::strerror(errno) << std::endl;
         return -1;
     }
 
     fd_set readfds_tpl;
-    std::set<socket_t> fds;
+    std::set<int> fds;
     int max_fd = server_socket;
     FD_SET(server_socket, &readfds_tpl);
     while (true) {
@@ -52,17 +51,17 @@ int serve(uint16_t port)
         if (nums < 0) {
             int error_code = errno;
             std::cerr << "select() error with errno:"
-                << error_code << " " << std::strerror(error_code);
+                      << error_code << " " << std::strerror(error_code);
             std::exit(-1);
         }
         if (FD_ISSET(server_socket, &readfds)) {
             //do_accept()
             //accept几次？
-            socket_t new_socket = ::accept(server_socket, nullptr, nullptr);
+            int new_socket = ::accept(server_socket, nullptr, nullptr);
             if (new_socket < 0) {
                 int error_code = errno;
                 std::cerr << "accept() error with errno:"
-                    << error_code << " " << std::strerror(error_code);
+                          << error_code << " " << std::strerror(error_code);
                 std::exit(-1);
             }
             FD_SET(new_socket, &readfds_tpl);
@@ -79,9 +78,7 @@ int serve(uint16_t port)
             }
             ++iter;
         }
-        
     }
-    
 }
 
 int main(int argc, char* argv[])
